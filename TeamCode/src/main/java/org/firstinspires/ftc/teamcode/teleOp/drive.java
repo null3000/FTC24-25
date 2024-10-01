@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.teleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -28,6 +30,8 @@ public class drive extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor testMotor = null;
+    private CRServo testCRServo = null;
+    private Servo testServo = null;
 
     @Override
     public void runOpMode() {
@@ -38,11 +42,14 @@ public class drive extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         testMotor = hardwareMap.get(DcMotor.class, "testMotor");
+        testCRServo = hardwareMap.get(CRServo.class, "testCRServo");
+        testServo = hardwareMap.get(Servo.class, "testServo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         testMotor.setDirection(DcMotor.Direction.FORWARD);
+        testCRServo.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -53,11 +60,23 @@ public class drive extends LinearOpMode {
         while (opModeIsActive()) {
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double power = Range.clip(gamepad1.left_stick_x, -1.0, 1.0);
-
-
+            double power = Range.clip(gamepad1.left_stick_y, -1.0, 1.0);
+            double servoPower = Range.clip(gamepad1.right_stick_y, -1.0, 1.0);
+            if(gamepad1.a){
+                testServo.setPosition(0.5);
+            }
+            if(gamepad1.b){
+                testServo.setPosition(0);
+            }
+            if(gamepad1.x){
+                testServo.setPosition(1);
+            }
+            if(gamepad1.y){
+                testServo.setPosition(0.75);
+            }
             // Send calculated power to wheels
             testMotor.setPower(power);
+            testCRServo.setPower(servoPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

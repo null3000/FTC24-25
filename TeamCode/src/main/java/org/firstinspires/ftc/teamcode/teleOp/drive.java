@@ -59,9 +59,18 @@ public class drive extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double power = Range.clip(-gamepad1.left_stick_y, -1.0, 1.0);
+            double power = 0;
             double position = intakeMotor.getCurrentPosition();
             // Send calculated power to wheels
+            //Max is 4200m min is 0
+
+            if(position >= 4200){
+                power = Range.clip(-gamepad1.left_stick_y, -1.0, 0);
+            } else if(position <= 0){
+                power = Range.clip(-gamepad1.left_stick_y, 0, 1.0);
+            } else{
+                power = Range.clip(-gamepad1.left_stick_y, -1.0, 1.0);
+            }
             intakeMotor.setPower(power);
 
 

@@ -69,9 +69,9 @@ public class drive extends LinearOpMode {
         //Max is 4200m min is 0
 
 //            3000 to be incredibly conservative, 4200 is a more realistic limit but we never have to extend that far anyways
-        int intakeMaxPosition = 3000;
+        int intakeMaxPosition = 1500;
 //            100 is a very good limit, limit of zero causes "jitters" on the way back down quickly
-        int intakeMinPosition = 100;
+        int intakeMinPosition = 75;
 
         if(position >= intakeMaxPosition){
             power = Range.clip(-gp.left_stick_y, -1.0, 0);

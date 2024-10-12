@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 
 /*
@@ -56,32 +57,38 @@ public class drive extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double power = 0;
-            double position = intakeMotor.getCurrentPosition();
-            // Send calculated power to wheels
-            //Max is 4200m min is 0
-
-            if(position >= 4200){
-                power = Range.clip(-gamepad1.left_stick_y, -1.0, 0);
-            } else if(position <= 0){
-                power = Range.clip(-gamepad1.left_stick_y, 0, 1.0);
-            } else{
-                power = Range.clip(-gamepad1.left_stick_y, -1.0, 1.0);
-            }
-            intakeMotor.setPower(power);
-
-
-
-
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "power (%.2f)", power);
-            telemetry.addData("Motors", "position (%.2f)", position);
-            telemetry.update();
+            intake(gamepad2);
         }
+
+    }
+
+    public void intake(Gamepad gp){
+        double power = 0;
+        double position = intakeMotor.getCurrentPosition();
+        // Send calculated power to wheels
+        //Max is 4200m min is 0
+
+//            3000 to be incredibly conservative, 4200 is a more realistic limit but we never have to extend that far anyways
+        int intakeMaxPosition = 3000;
+//            100 is a very good limit, limit of zero causes "jitters" on the way back down quickly
+        int intakeMinPosition = 100;
+
+        if(position >= intakeMaxPosition){
+            power = Range.clip(-gp.left_stick_y, -1.0, 0);
+        } else if(position <= intakeMinPosition){
+            power = Range.clip(-gp.left_stick_y, 0, 1.0);
+        } else{
+            power = Range.clip(-gp.left_stick_y, -1.0, 1.0);
+        }
+
+
+        intakeMotor.setPower(power);
+
+
+        // Show the elapsed game time and wheel power.
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Motors", "power (%.2f)", power);
+        telemetry.addData("Motors", "position (%.2f)", position);
+        telemetry.update();
     }
 }

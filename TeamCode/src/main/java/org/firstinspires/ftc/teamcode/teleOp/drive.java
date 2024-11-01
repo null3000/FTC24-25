@@ -35,10 +35,14 @@ public class drive extends LinearOpMode {
     private DcMotor outakeMotor1 = null;
     private DcMotor outakeMotor2 = null;
 
+    private Servo outakeServo = null;
+
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private CRServo intakeServo = null;
+
 
 
     @Override
@@ -50,14 +54,20 @@ public class drive extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        intakeServo = hardwareMap.get(CRServo.class, "intakeServo");
+
 
         outakeMotor1 = hardwareMap.get(DcMotor.class, "outakeMotor1");
         outakeMotor2 = hardwareMap.get(DcMotor.class, "outakeMotor2");
+        outakeServo = hardwareMap.get(Servo.class, "outakeServo");
+        outakeServo.setPosition(0);
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+
+
 
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -69,6 +79,7 @@ public class drive extends LinearOpMode {
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+
         outakeMotor1.setDirection(DcMotor.Direction.FORWARD);
         outakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outakeMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -77,8 +88,8 @@ public class drive extends LinearOpMode {
         outakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outakeMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
@@ -86,6 +97,8 @@ public class drive extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -149,6 +162,7 @@ public class drive extends LinearOpMode {
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+        telemetry.addData("Stick", "x (%.2f), y (%.2f)", gamepad1.left_stick_x, gamepad1.left_stick_y);
     }
 
     public void intake(Gamepad gp){
@@ -173,9 +187,16 @@ public class drive extends LinearOpMode {
 
         intakeMotor.setPower(power);
 
+        if(gp.x){
+            intakeServo.setPower(1);
+        } else if(gp.y){
+            intakeServo.setPower(-1);
+        } else{
+            intakeServo.setPower(0);
+        }
+
 
         // Show the elapsed game time and wheel power.
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "power (%.2f)", power);
         telemetry.addData("Motors", "position (%.2f)", position);
     }
@@ -183,7 +204,12 @@ public class drive extends LinearOpMode {
         double power = 0;
         power = Range.clip(gp.right_stick_y, -1.0, 1.0);
         outakeMotor1.setPower(power);
-//        outakeMotor2.setPower(power);
-
+        outakeMotor2.setPower(power);
+        if(gp.a){
+            outakeServo.setPosition(0);
+        } else if(gp.b){
+            outakeServo.setPosition(.5);
+        }
+        
     }
 }

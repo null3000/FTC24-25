@@ -60,7 +60,7 @@ public class drive extends LinearOpMode {
         outakeMotor1 = hardwareMap.get(DcMotor.class, "outakeMotor1");
         outakeMotor2 = hardwareMap.get(DcMotor.class, "outakeMotor2");
         outakeServo = hardwareMap.get(Servo.class, "outakeServo");
-        outakeServo.setPosition(0);
+        outakeServo.setPosition(.75);
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
@@ -81,17 +81,23 @@ public class drive extends LinearOpMode {
 
 
         outakeMotor1.setDirection(DcMotor.Direction.FORWARD);
-        outakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outakeMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outakeMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outakeMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         outakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         outakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outakeMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+//        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+//        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+//        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+//        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -188,9 +194,9 @@ public class drive extends LinearOpMode {
         intakeMotor.setPower(power);
 
         if(gp.x){
-            intakeServo.setPower(1);
+            intakeServo.setPower(.5);
         } else if(gp.y){
-            intakeServo.setPower(-1);
+            intakeServo.setPower(-.5);
         } else{
             intakeServo.setPower(0);
         }
@@ -199,17 +205,41 @@ public class drive extends LinearOpMode {
         // Show the elapsed game time and wheel power.
         telemetry.addData("Motors", "power (%.2f)", power);
         telemetry.addData("Motors", "position (%.2f)", position);
+        telemetry.addData("CRServo", "power (%.2f)", intakeServo.getPower());
     }
     public void outake(Gamepad gp) {
         double power = 0;
         power = Range.clip(gp.right_stick_y, -1.0, 1.0);
+
+        double position = outakeMotor1.getCurrentPosition();
+        int outakeMinPosition = 75;
+        int outakeMaxPosition = 5700;
+
+//honestly this doesnt make sense, (its in reverse?) but it works so dont touch
+        if(position >= outakeMaxPosition){
+            power = Range.clip(gp.right_stick_y, 0, 1);
+        } else if(position <= outakeMinPosition){
+            power = Range.clip(gp.right_stick_y, -1, 0);
+        } else{
+            power = Range.clip(gp.right_stick_y, -1.0, 1.0);
+        }
+//
+
         outakeMotor1.setPower(power);
         outakeMotor2.setPower(power);
+
+
+
+
+
+
         if(gp.a){
-            outakeServo.setPosition(0);
+            outakeServo.setPosition(.75);
         } else if(gp.b){
-            outakeServo.setPosition(.5);
+            outakeServo.setPosition(.25);
         }
+
+        telemetry.addData("position", position);
         
     }
 }

@@ -43,6 +43,8 @@ public class drive extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private CRServo intakeServo = null;
 
+    private Servo intakeServo2 = null;
+
 
 
     @Override
@@ -55,6 +57,7 @@ public class drive extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         intakeServo = hardwareMap.get(CRServo.class, "intakeServo");
+        intakeServo2 = hardwareMap.get(Servo.class, "intakeServo2");
 
 
         outakeMotor1 = hardwareMap.get(DcMotor.class, "outakeMotor1");
@@ -89,15 +92,15 @@ public class drive extends LinearOpMode {
         outakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outakeMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-//        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-//        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-//        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+//        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+//        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+//        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+//        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -189,10 +192,7 @@ public class drive extends LinearOpMode {
         } else{
             power = Range.clip(-gp.left_stick_y, -1.0, 1.0);
         }
-
-
         intakeMotor.setPower(power);
-
         if(gp.x){
             intakeServo.setPower(.5);
         } else if(gp.y){
@@ -200,6 +200,18 @@ public class drive extends LinearOpMode {
         } else{
             intakeServo.setPower(0);
         }
+
+        if (gp.dpad_left || gp.dpad_right){
+            intakeServo2.setPosition(.2);
+        } else if (gp.dpad_up){
+//            center
+            intakeServo2.setPosition(.3);
+        } else if (gp.dpad_down) {
+//            down
+            intakeServo2.setPosition(.5);
+        }
+
+
 
 
         // Show the elapsed game time and wheel power.
@@ -227,11 +239,6 @@ public class drive extends LinearOpMode {
 
         outakeMotor1.setPower(power);
         outakeMotor2.setPower(power);
-
-
-
-
-
 
         if(gp.a){
             outakeServo.setPosition(.75);

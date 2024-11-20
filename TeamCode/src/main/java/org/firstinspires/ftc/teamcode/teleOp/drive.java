@@ -63,7 +63,7 @@ public class drive extends LinearOpMode {
         outakeMotor1 = hardwareMap.get(DcMotor.class, "outakeMotor1");
         outakeMotor2 = hardwareMap.get(DcMotor.class, "outakeMotor2");
         outakeServo = hardwareMap.get(Servo.class, "outakeServo");
-        outakeServo.setPosition(.75);
+        outakeServo.setPosition(.65);
 
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
@@ -146,6 +146,14 @@ public class drive extends LinearOpMode {
             rightBackPower  /= max;
         }
 
+        boolean speedModeActive = gp.right_bumper;
+        double speedModifier;
+        if (speedModeActive) {
+            speedModifier = 1;
+        } else {
+            speedModifier = .75;
+        }
+
         // This is test code:
         //
         // Uncomment the following code to test your motor directions.
@@ -164,10 +172,10 @@ public class drive extends LinearOpMode {
             */
 
         // Send calculated power to wheels
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
+        leftFrontDrive.setPower(leftFrontPower * speedModifier);
+        rightFrontDrive.setPower(rightFrontPower * speedModifier);
+        leftBackDrive.setPower(leftBackPower * speedModifier);
+        rightBackDrive.setPower(rightBackPower * speedModifier);
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
@@ -194,14 +202,14 @@ public class drive extends LinearOpMode {
         }
         intakeMotor.setPower(power);
         if(gp.x){
-            intakeServo.setPower(.5);
+            intakeServo.setPower(.75);
         } else if(gp.y){
-            intakeServo.setPower(-.5);
+            intakeServo.setPower(-.75);
         } else{
             intakeServo.setPower(0);
         }
 
-        if (gp.dpad_left || gp.dpad_right){
+        if (gp.dpad_left){
             intakeServo2.setPosition(.2);
         } else if (gp.dpad_up){
 //            center
@@ -209,9 +217,10 @@ public class drive extends LinearOpMode {
         } else if (gp.dpad_down) {
 //            down
             intakeServo2.setPosition(.5);
+        } else if (gp.dpad_right) {
+            intakeServo2.setPosition(.4);
+
         }
-
-
 
 
         // Show the elapsed game time and wheel power.
@@ -241,9 +250,11 @@ public class drive extends LinearOpMode {
         outakeMotor2.setPower(power);
 
         if(gp.a){
-            outakeServo.setPosition(.75);
+            outakeServo.setPosition(.7);
         } else if(gp.b){
             outakeServo.setPosition(.25);
+        } else if (gp.right_bumper) {
+            outakeServo.setPosition(.75);
         }
 
         telemetry.addData("position", position);
